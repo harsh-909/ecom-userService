@@ -8,6 +8,6 @@ import org.springframework.stereotype.Repository;
 public interface TokenRepository extends JpaRepository<UserToken,Long> {
     UserToken findByToken(String token);
 
-    UserToken findByTokenAndIsDeleted(String token, boolean isDeleted);
+    UserToken findByTokenAndDeleted(String token, boolean isDeleted);
 
 }

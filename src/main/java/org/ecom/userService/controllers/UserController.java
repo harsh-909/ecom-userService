@@ -70,7 +70,7 @@ public class UserController {
         return new ResponseEntity<>(new SuccessDto("User signed up successfully"), HttpStatus.OK);
     }
 
-    @GetMapping("/validateToken")
+    @PostMapping("/validateToken")
     public ResponseEntity<SuccessDto> validateToken(@RequestHeader("Authorization") String token){
         boolean isValid = userService.validateToken(token);
         if(isValid) return new ResponseEntity<>(new SuccessDto("Token is valid"), HttpStatus.OK);

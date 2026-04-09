@@ -24,7 +24,7 @@ public class AppConfiguration {
             .csrf(AbstractHttpConfigurer::disable)
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/users/signUp", "/users/login", "/users/logout").permitAll()
+                .requestMatchers("/users/signUp", "/users/login", "/users/logout", "/users/validateToken").permitAll()
                 .anyRequest().authenticated()
             );
         return http.build();

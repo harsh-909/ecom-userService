@@ -21,6 +21,6 @@ public class BaseModel {
     private Long id;
     private Date isCreated;
     private Date lastUpdated;
-    private boolean isDeleted;
+    private boolean deleted;
 
 }

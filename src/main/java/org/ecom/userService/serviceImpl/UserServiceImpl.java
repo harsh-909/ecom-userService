@@ -132,7 +132,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public void logout(String token) {
         if (token.startsWith("Bearer ")) token = token.substring(7);
-        Optional<UserToken> userTokenOptional = Optional.ofNullable(tokenRepository.findByTokenAndIsDeleted(token, false));
+        Optional<UserToken> userTokenOptional = Optional.ofNullable(tokenRepository.findByTokenAndDeleted(token, false));
         if(userTokenOptional.isEmpty()) throw new UserNotFoundException("Invalid token");
         UserToken userToken = userTokenOptional.get();
         userToken.setDeleted(true);
@@ -154,7 +154,7 @@ public class UserServiceImpl implements UserService {
         }
 
         // 2. Check token hasn't been logged out (soft-deleted in DB)
-        Optional<UserToken> userTokenOptional = Optional.ofNullable(tokenRepository.findByTokenAndIsDeleted(token, false));
+        Optional<UserToken> userTokenOptional = Optional.ofNullable(tokenRepository.findByTokenAndDeleted(token, false));
         return userTokenOptional.isPresent();
     }
 
