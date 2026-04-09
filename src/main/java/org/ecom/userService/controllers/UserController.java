@@ -1,7 +1,11 @@
 package org.ecom.userService.controllers;
 
-import org.ecom.userService.dto.ExceptionDto;
+import org.ecom.userService.dto.SuccessDto;
+import org.ecom.userService.dto.UserLoginDto;
+import org.ecom.userService.dto.UserSignUpDto;
+import org.ecom.userService.dto.UserTokenDto;
 import org.ecom.userService.models.User;
+
 import org.ecom.userService.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -43,11 +47,34 @@ public class UserController {
         return new ResponseEntity<>(userService.updateAUser(id,user),HttpStatus.OK);
     }
 
-     @DeleteMapping("/{id}")
-    public ResponseEntity<ExceptionDto> deleteAUser(@PathVariable("id") Long id) {
+    @DeleteMapping("/{id}")
+    public ResponseEntity<SuccessDto> deleteAUser(@PathVariable("id") Long id) {
          userService.deleteAUser(id);
-         return new ResponseEntity<>(new ExceptionDto("user deleted successfully"),HttpStatus.OK);
+         return new ResponseEntity<>(new SuccessDto("user deleted successfully"), HttpStatus.OK);
+    }
 
-     }
+    @GetMapping("/login")
+    public ResponseEntity<UserTokenDto> Login(@RequestBody UserLoginDto userLoginDto){
+        return new ResponseEntity<>(userService.login(userLoginDto), HttpStatus.OK);
+    }
+
+    @GetMapping("/logout")
+    public ResponseEntity<SuccessDto> logout(@RequestHeader("Authorization") String token){
+        userService.logout(token);
+        return new ResponseEntity<>(new SuccessDto("User logged out successfully"), HttpStatus.OK);
+    }
+
+    @PostMapping("/signUp")
+    public ResponseEntity<SuccessDto> signUp(@RequestBody UserSignUpDto userSignUpDto){
+        userService.signUp(userSignUpDto);
+        return new ResponseEntity<>(new SuccessDto("User signed up successfully"), HttpStatus.OK);
+    }
+
+    @GetMapping("/validateToken")
+    public ResponseEntity<SuccessDto> validateToken(@RequestHeader("Authorization") String token){
+        boolean isValid = userService.validateToken(token);
+        if(isValid) return new ResponseEntity<>(new SuccessDto("Token is valid"), HttpStatus.OK);
+        else return new ResponseEntity<>(new SuccessDto("Token is invalid"), HttpStatus.UNAUTHORIZED);
+    }
 }
 
