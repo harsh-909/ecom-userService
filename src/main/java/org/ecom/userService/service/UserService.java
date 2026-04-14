@@ -3,6 +3,7 @@ package org.ecom.userService.service;
 import org.ecom.userService.dto.UserLoginDto;
 import org.ecom.userService.dto.UserSignUpDto;
 import org.ecom.userService.dto.UserTokenDto;
+import org.ecom.userService.exceptions.InvalidTokenException;
 import org.ecom.userService.models.User;
 import org.ecom.userService.models.UserToken;
 
@@ -28,6 +29,6 @@ public interface UserService {
 
     public void signUp(UserSignUpDto userSignUpDto);
 
-    public boolean validateToken(String token);
+    public UserTokenDto validateToken(String token) throws InvalidTokenException;
 
 }

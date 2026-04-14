@@ -3,9 +3,11 @@ package org.ecom.userService.serviceImpl;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
+import io.micrometer.core.instrument.config.validate.Validated;
 import org.ecom.userService.dto.UserLoginDto;
 import org.ecom.userService.dto.UserSignUpDto;
 import org.ecom.userService.dto.UserTokenDto;
+import org.ecom.userService.exceptions.InvalidTokenException;
 import org.ecom.userService.exceptions.UserNotFoundException;
 import org.ecom.userService.mapper.TokenToTokenDto;
 import org.ecom.userService.models.User;
@@ -18,6 +20,7 @@ import org.ecom.userService.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.web.csrf.InvalidCsrfTokenException;
 import org.springframework.stereotype.Service;
 
 import javax.crypto.SecretKey;
@@ -121,9 +124,7 @@ public class UserServiceImpl implements UserService {
 
         UserToken userToken = new UserToken();
         userToken.setToken(jwt);
-        userToken.setUserEmail(userEmail);
-        userToken.setExpiryTime(expiry);
-        userToken.setUserRoles(roles);
+        userToken.setUser(userOptional.get());
         tokenRepository.save(userToken);
 
         return TokenToTokenDto.convertUserTokenToTokenDto(userToken);
@@ -140,7 +141,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public boolean validateToken(String token) {
+    public UserTokenDto validateToken(String token) throws InvalidTokenException {
         if (token.startsWith("Bearer ")) token = token.substring(7);
 
         // 1. Verify JWT signature and expiry
@@ -150,12 +151,12 @@ public class UserServiceImpl implements UserService {
                     .build()
                     .parseSignedClaims(token);
         } catch (JwtException e) {
-            return false;
+            throw new InvalidTokenException("Token not valid");
         }
 
         // 2. Check token hasn't been logged out (soft-deleted in DB)
         Optional<UserToken> userTokenOptional = Optional.ofNullable(tokenRepository.findByTokenAndDeleted(token, false));
-        return userTokenOptional.isPresent();
+        return userTokenOptional.map(TokenToTokenDto::convertUserTokenToTokenDto).orElse(null);
     }
 
     @Override

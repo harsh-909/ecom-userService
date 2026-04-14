@@ -4,8 +4,9 @@ import org.ecom.userService.dto.SuccessDto;
 import org.ecom.userService.dto.UserLoginDto;
 import org.ecom.userService.dto.UserSignUpDto;
 import org.ecom.userService.dto.UserTokenDto;
+import org.ecom.userService.exceptions.InvalidTokenException;
+import org.ecom.userService.exceptions.UserNotFoundException;
 import org.ecom.userService.models.User;
-
 import org.ecom.userService.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -71,10 +72,10 @@ public class UserController {
     }
 
     @PostMapping("/validateToken")
-    public ResponseEntity<SuccessDto> validateToken(@RequestHeader("Authorization") String token){
-        boolean isValid = userService.validateToken(token);
-        if(isValid) return new ResponseEntity<>(new SuccessDto("Token is valid"), HttpStatus.OK);
-        else return new ResponseEntity<>(new SuccessDto("Token is invalid"), HttpStatus.UNAUTHORIZED);
+    public ResponseEntity<UserTokenDto> validateToken(@RequestHeader("Authorization") String token) throws InvalidTokenException {
+        UserTokenDto userTokenDto = userService.validateToken(token);
+        if(userTokenDto == null) throw new UserNotFoundException("Invalid User");
+        return new ResponseEntity<>(userTokenDto, HttpStatus.OK);
     }
 }
 
