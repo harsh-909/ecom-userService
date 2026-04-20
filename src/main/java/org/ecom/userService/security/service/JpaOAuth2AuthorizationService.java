@@ -8,6 +8,7 @@ import java.util.function.Consumer;
 import tools.jackson.core.type.TypeReference;
 import tools.jackson.databind.ObjectMapper;
 import tools.jackson.databind.json.JsonMapper;
+import tools.jackson.databind.jsontype.BasicPolymorphicTypeValidator;
 import org.ecom.userService.security.models.Authorization;
 import org.ecom.userService.security.repository.AuthorizationRepository;
 
@@ -44,9 +45,17 @@ public class JpaOAuth2AuthorizationService implements OAuth2AuthorizationService
         this.authorizationRepository = authorizationRepository;
         this.registeredClientRepository = registeredClientRepository;
 
+        BasicPolymorphicTypeValidator ptv = BasicPolymorphicTypeValidator.builder()
+                .allowIfSubType("org.ecom.userService")
+                .allowIfSubType("org.springframework.security")
+                .allowIfSubType("java.util")
+                .allowIfSubType("java.lang")
+                .build();
+
         ClassLoader classLoader = JpaOAuth2AuthorizationService.class.getClassLoader();
         this.objectMapper = JsonMapper.builder()
                 .addModules(SecurityJacksonModules.getModules(classLoader))
+                .activateDefaultTyping(ptv)
                 .build();
     }
 
@@ -179,69 +188,57 @@ public class JpaOAuth2AuthorizationService implements OAuth2AuthorizationService
 
         OAuth2Authorization.Token<OAuth2AuthorizationCode> authorizationCode =
                 authorization.getToken(OAuth2AuthorizationCode.class);
-        setTokenValues(
-                authorizationCode,
+        setTokenValues(authorizationCode,
                 entity::setAuthorizationCodeValue,
                 entity::setAuthorizationCodeIssuedAt,
                 entity::setAuthorizationCodeExpiresAt,
-                entity::setAuthorizationCodeMetadata
-        );
+                entity::setAuthorizationCodeMetadata);
 
         OAuth2Authorization.Token<OAuth2AccessToken> accessToken =
                 authorization.getToken(OAuth2AccessToken.class);
-        setTokenValues(
-                accessToken,
+        setTokenValues(accessToken,
                 entity::setAccessTokenValue,
                 entity::setAccessTokenIssuedAt,
                 entity::setAccessTokenExpiresAt,
-                entity::setAccessTokenMetadata
-        );
+                entity::setAccessTokenMetadata);
         if (accessToken != null && accessToken.getToken().getScopes() != null) {
             entity.setAccessTokenScopes(StringUtils.collectionToDelimitedString(accessToken.getToken().getScopes(), ","));
         }
 
         OAuth2Authorization.Token<OAuth2RefreshToken> refreshToken =
                 authorization.getToken(OAuth2RefreshToken.class);
-        setTokenValues(
-                refreshToken,
+        setTokenValues(refreshToken,
                 entity::setRefreshTokenValue,
                 entity::setRefreshTokenIssuedAt,
                 entity::setRefreshTokenExpiresAt,
-                entity::setRefreshTokenMetadata
-        );
+                entity::setRefreshTokenMetadata);
 
         OAuth2Authorization.Token<OidcIdToken> oidcIdToken =
                 authorization.getToken(OidcIdToken.class);
-        setTokenValues(
-                oidcIdToken,
+        setTokenValues(oidcIdToken,
                 entity::setOidcIdTokenValue,
                 entity::setOidcIdTokenIssuedAt,
                 entity::setOidcIdTokenExpiresAt,
-                entity::setOidcIdTokenMetadata
-        );
+                entity::setOidcIdTokenMetadata);
         if (oidcIdToken != null) {
             entity.setOidcIdTokenClaims(writeMap(oidcIdToken.getClaims()));
         }
 
         OAuth2Authorization.Token<OAuth2UserCode> userCode =
                 authorization.getToken(OAuth2UserCode.class);
-        setTokenValues(
-                userCode,
+        setTokenValues(userCode,
                 entity::setUserCodeValue,
                 entity::setUserCodeIssuedAt,
                 entity::setUserCodeExpiresAt,
-                entity::setUserCodeMetadata
-        );
+                entity::setUserCodeMetadata);
 
         OAuth2Authorization.Token<OAuth2DeviceCode> deviceCode =
                 authorization.getToken(OAuth2DeviceCode.class);
-        setTokenValues(
-                deviceCode,
+        setTokenValues(deviceCode,
                 entity::setDeviceCodeValue,
                 entity::setDeviceCodeIssuedAt,
                 entity::setDeviceCodeExpiresAt,
-                entity::setDeviceCodeMetadata
-        );
+                entity::setDeviceCodeMetadata);
 
         return entity;
     }
@@ -263,8 +260,7 @@ public class JpaOAuth2AuthorizationService implements OAuth2AuthorizationService
 
     private Map<String, Object> parseMap(String data) {
         try {
-            return this.objectMapper.readValue(data, new TypeReference<Map<String, Object>>() {
-            });
+            return this.objectMapper.readValue(data, new TypeReference<>() {});
         } catch (Exception ex) {
             throw new IllegalArgumentException(ex.getMessage(), ex);
         }
@@ -288,6 +284,6 @@ public class JpaOAuth2AuthorizationService implements OAuth2AuthorizationService
         } else if (AuthorizationGrantType.DEVICE_CODE.getValue().equals(authorizationGrantType)) {
             return AuthorizationGrantType.DEVICE_CODE;
         }
-        return new AuthorizationGrantType(authorizationGrantType);              // Custom authorization grant type
+        return new AuthorizationGrantType(authorizationGrantType);
     }
 }

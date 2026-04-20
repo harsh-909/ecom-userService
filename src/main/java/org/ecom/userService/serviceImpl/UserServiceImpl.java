@@ -20,6 +20,7 @@ import org.ecom.userService.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.csrf.InvalidCsrfTokenException;
 import org.springframework.stereotype.Service;
 
@@ -32,7 +33,7 @@ public class UserServiceImpl implements UserService {
     private final UserRepositiory userRepositiory;
     private final TokenRepository tokenRepository;
     private final UserRoleRepository userRoleRepository;
-    private final BCryptPasswordEncoder passwordEncoder;
+    private final PasswordEncoder passwordEncoder;
 
     @Value("${jwt.secret}")
     private String jwtSecret;
@@ -41,7 +42,7 @@ public class UserServiceImpl implements UserService {
     public UserServiceImpl(UserRepositiory userRepositiory,
                            TokenRepository tokenRepository,
                            UserRoleRepository userRoleRepository,
-                           BCryptPasswordEncoder passwordEncoder){
+                           PasswordEncoder passwordEncoder){
         this.userRepositiory = userRepositiory;
         this.tokenRepository = tokenRepository;
         this.userRoleRepository = userRoleRepository;
