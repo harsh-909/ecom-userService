@@ -19,6 +19,7 @@ import org.ecom.userService.repositories.UserRoleRepository;
 import org.ecom.userService.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Primary;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.csrf.InvalidCsrfTokenException;
@@ -27,6 +28,7 @@ import org.springframework.stereotype.Service;
 import javax.crypto.SecretKey;
 import java.util.*;
 
+@Primary
 @Service("selfUserService")
 public class UserServiceImpl implements UserService {
 

@@ -45,17 +45,14 @@ public class JpaOAuth2AuthorizationService implements OAuth2AuthorizationService
         this.authorizationRepository = authorizationRepository;
         this.registeredClientRepository = registeredClientRepository;
 
-        BasicPolymorphicTypeValidator ptv = BasicPolymorphicTypeValidator.builder()
-                .allowIfSubType("org.ecom.userService")
-                .allowIfSubType("org.springframework.security")
-                .allowIfSubType("java.util")
-                .allowIfSubType("java.lang")
-                .build();
+        BasicPolymorphicTypeValidator.Builder ptvBuilder = BasicPolymorphicTypeValidator.builder()
+                .allowIfSubType(org.ecom.userService.models.CustomUserDetails.class)
+                .allowIfSubType(org.ecom.userService.models.CustomGrantedAuthority.class)
+                .allowIfSubType("java.util.ImmutableCollections");
 
         ClassLoader classLoader = JpaOAuth2AuthorizationService.class.getClassLoader();
         this.objectMapper = JsonMapper.builder()
-                .addModules(SecurityJacksonModules.getModules(classLoader))
-                .activateDefaultTyping(ptv)
+                .addModules(SecurityJacksonModules.getModules(classLoader, ptvBuilder))
                 .build();
     }
 

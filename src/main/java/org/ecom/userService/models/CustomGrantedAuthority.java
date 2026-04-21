@@ -1,10 +1,12 @@
 package org.ecom.userService.models;
 
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import org.jspecify.annotations.Nullable;
 import org.springframework.security.core.GrantedAuthority;
 import tools.jackson.databind.annotation.JsonDeserialize;
 
+@JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY)
 @JsonDeserialize
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class CustomGrantedAuthority implements GrantedAuthority {

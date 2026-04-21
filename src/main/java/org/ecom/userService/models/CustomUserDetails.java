@@ -1,5 +1,6 @@
 package org.ecom.userService.models;
 
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -8,6 +9,7 @@ import tools.jackson.databind.annotation.JsonDeserialize;
 import java.util.Collection;
 import java.util.List;
 
+@JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY)
 @JsonDeserialize
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class CustomUserDetails implements UserDetails {
@@ -19,6 +21,7 @@ public class CustomUserDetails implements UserDetails {
     private boolean isAccountNonLocked;
     private boolean isCredentialsNonExpired;
     private boolean isEnabled;
+    private Long userId;
 
 
     public CustomUserDetails() {}
@@ -33,6 +36,15 @@ public class CustomUserDetails implements UserDetails {
         this.isAccountNonLocked = true;
         this.isEnabled = true;
         this.isCredentialsNonExpired = true;
+        this.userId = user.getId();
+    }
+
+    public Long getUserId() {
+        return userId;
+    }
+
+    public void setUserId(Long userId) {
+        this.userId = userId;
     }
 
     @Override
